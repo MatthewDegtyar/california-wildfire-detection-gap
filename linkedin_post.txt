@@ -1,23 +1,36 @@
-97% of California wildfires contained under 10 acres never produce a single satellite detection.
+═══════════════════════════════════════════════════════════════════════
+LINKEDIN POST (paste as-is)
+═══════════════════════════════════════════════════════════════════════
 
-For the 2020 CA fire season I quantified where and when the standard satellite wildfire product (FIRMS / VIIRS) fails — and therefore where aerial detection (drones, persistent loiter) adds the most marginal value.
+97% of California wildfires contained under 10 acres never produce a single FIRMS satellite detection.
 
-A few specifics:
+I quantified where satellite wildfire detection fails across the 2020 CA fire season, and therefore where aerial detection (drones, persistent loiter) adds the most marginal value.
 
-→ Detection rate by fire size: 3.2% for <10 ac, 25.2% for 10–1k ac, 79.8% for ≥1k ac. Since ~93% of CA fires end below 10 ac, the addressable market for aerial detection IS the gap below 10 ac.
+Methodology, calibrated model, gap-surface map, and the 12-page write-up:
+github.com/MatthewDegtyar/california-wildfire-detection-gap
 
-→ When FIRMS does catch a fire that CAL FIRE also logged (n=68 perimeters), median latency from reported alarm to first satellite pixel is 7 hours. Half a day of fire growth before the satellite alerts — and that's only for the fires that satellites eventually catch at all.
+If you work in fire detection or autonomous aerial, I'd love to compare notes.
 
-→ A calibrated gradient-boost model on fire size, lat/lon, season, time-of-day, and VIIRS overpass timing predicts detection at AUC 0.84 ± 0.03 (5-fold OOF). Adding terrain (slope/aspect/TPI) and LANDFIRE fuel didn't beat it on this dataset — an honest null result, not a victory I'd hide.
+#wildfire #remotesensing #drones
 
-→ The detection gap is highest in the Klamath / northern Sierra interior. The "where to base aircraft" map is suggestive, but single-year CA — needs Oregon/Idaho replication before it can drive a real basing decision.
 
-The 97% combines two distinct failure modes: VIIRS sometimes can't see a small fire even when looking, AND VIIRS only passes overhead 2–4 times per day. Both fail the same way operationally; both are closed by a loitering aircraft.
+═══════════════════════════════════════════════════════════════════════
+IMAGES (in linkedin_images/, in upload order)
+═══════════════════════════════════════════════════════════════════════
 
-Data sources: FIRMS VIIRS VNP14 (NASA), FPA-FOD v6 (USFS), NIFC InterAgency burn perimeters, CAL FIRE public incidents, LANDFIRE FBFM40, Open-Elevation.
+1. 1_hit_rate_by_size.png  — the headline bar chart
+2. 2_gap_surface.png       — the cause-mix-weighted CA gap surface
+3. 3_latency.png           — latency distribution (optional 3rd)
 
-The question I'm chasing next: does adding VIIRS NOAA-20 (a second sensor on a different orbit, halving the overpass gap) change the marginal-value math enough to erode the aerial case — or not?
 
-If you work in fire detection, suppression, or autonomous aerial systems and want to compare notes, I'd genuinely like to hear what your operational read of this is.
+═══════════════════════════════════════════════════════════════════════
+NOTES
+═══════════════════════════════════════════════════════════════════════
 
-#wildfire #satellite #remotesensing #machinelearning #drones
+- The repo URL is in the body (not the first comment) because the post
+  is short enough that LinkedIn won't down-rank it. The first-comment
+  trick matters for long posts where the algorithm reads external links
+  as "trying to redirect off-platform."
+- Hook lands above the fold even on mobile (under 210 chars).
+- Do not tag the alum in the post. The post is a portfolio piece you
+  can link to in a DM; the DM is the actual outreach.
