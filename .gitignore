@@ -1,0 +1,18 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.claude/
+
+# Pandoc/tectonic intermediates from the memo render
+memo/_pandoc_input.md
+memo/_preamble.tex
+
+# Data: raw downloads stay local; processed parquet can be regenerated
+data/raw/
+data/processed/
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+
+.DS_Store

@@ -1,0 +1,23 @@
+97% of California wildfires contained under 10 acres never produce a single satellite detection.
+
+For the 2020 CA fire season I quantified where and when the standard satellite wildfire product (FIRMS / VIIRS) fails — and therefore where aerial detection (drones, persistent loiter) adds the most marginal value.
+
+A few specifics:
+
+→ Detection rate by fire size: 3.2% for <10 ac, 25.2% for 10–1k ac, 79.8% for ≥1k ac. Since ~93% of CA fires end below 10 ac, the addressable market for aerial detection IS the gap below 10 ac.
+
+→ When FIRMS does catch a fire that CAL FIRE also logged (n=68 perimeters), median latency from reported alarm to first satellite pixel is 7 hours. Half a day of fire growth before the satellite alerts — and that's only for the fires that satellites eventually catch at all.
+
+→ A calibrated gradient-boost model on fire size, lat/lon, season, time-of-day, and VIIRS overpass timing predicts detection at AUC 0.84 ± 0.03 (5-fold OOF). Adding terrain (slope/aspect/TPI) and LANDFIRE fuel didn't beat it on this dataset — an honest null result, not a victory I'd hide.
+
+→ The detection gap is highest in the Klamath / northern Sierra interior. The "where to base aircraft" map is suggestive, but single-year CA — needs Oregon/Idaho replication before it can drive a real basing decision.
+
+The 97% combines two distinct failure modes: VIIRS sometimes can't see a small fire even when looking, AND VIIRS only passes overhead 2–4 times per day. Both fail the same way operationally; both are closed by a loitering aircraft.
+
+Data sources: FIRMS VIIRS VNP14 (NASA), FPA-FOD v6 (USFS), NIFC InterAgency burn perimeters, CAL FIRE public incidents, LANDFIRE FBFM40, Open-Elevation.
+
+The question I'm chasing next: does adding VIIRS NOAA-20 (a second sensor on a different orbit, halving the overpass gap) change the marginal-value math enough to erode the aerial case — or not?
+
+If you work in fire detection, suppression, or autonomous aerial systems and want to compare notes, I'd genuinely like to hear what your operational read of this is.
+
+#wildfire #satellite #remotesensing #machinelearning #drones

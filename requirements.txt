@@ -1,0 +1,8 @@
+requests
+pandas
+geopandas
+shapely
+pyarrow
+matplotlib
+python-dotenv
+tqdm

@@ -1,0 +1,147 @@
+WHAT'S NEXT — pulled from the May 2026 memo before publication.
+Kept here as a working punch-list for v2 of this project.
+
+Context: The four extensions in v1 (polygon-matching, swath-edge stratification,
+terrain derivatives, LANDFIRE fuel) produced three findings and one informative
+null result. These are the natural next moves.
+
+----------------------------------------------------------------------
+
+1. PER-PIXEL LATENCY BY SCAN GEOMETRY
+
+   Among all VIIRS pixels intersecting a perimeter, which fired first — nadir
+   or edge? Hypothesis: edge pixels are not just less sensitive but
+   *systematically late*. The data is sitting in the existing parquet files;
+   the analysis is one groupby + a paired comparison.
+
+   Why it matters: separates the "FIRMS misses small fires" finding (sensor
+   sensitivity) from the "FIRMS sees big fires late" finding (overpass +
+   thermal-signature growth). A founder thinking about loiter aircraft cares
+   most about the latency story for the catchable-fire subset.
+
+----------------------------------------------------------------------
+
+2. ADD VIIRS NOAA-20 (`VIIRS_NOAA20_SP`)
+
+   A second sensor on a different sun-synchronous orbit halves the overpass
+   gap, especially for the Sierra east slope afternoon coverage. Re-running
+   the whole pipeline with the union of Suomi-NPP + NOAA-20 detections would
+   re-compute the marginal-value math.
+
+   Why it matters: this is the *one* question that matters most for the
+   aerial value proposition. If NOAA-20 alone closes most of the gap, the
+   case for loiter aircraft erodes. If it doesn't, the case strengthens.
+   This is the question to lead with for a peer-level conversation with
+   anyone who works on autonomous detection.
+
+   Cost: one additional fetch from the FIRMS API (same endpoint, different
+   `source` parameter). Maybe one day of pipeline updates.
+
+----------------------------------------------------------------------
+
+3. REAL 30 m DEM (USGS 3DEP)
+
+   Replace the Open-Elevation neighbor-sampled slope/aspect/TPI features
+   with a proper 30 m USGS 3DEP raster sampled with rasterio. The current
+   features were computed from a ±0.005° (≈555 m) neighbor offset, which
+   tests "is this in the mountains" well and "is this a steep canyon"
+   poorly.
+
+   Why it matters: tests whether the v3 = v2 null is a feature-design issue
+   (current terrain features too coarse) or a real ceiling on what
+   information lat/lon + elevation already carries.
+
+   Cost: rasterio + USGS 3DEP download (~50 GB for CA at 30 m) + sampling
+   pipeline.
+
+----------------------------------------------------------------------
+
+4. MTBS BURN-SEVERITY LAYER
+
+   Severity correlates with thermal-signature persistence — the real driver
+   of FIRMS detection probability. Joining MTBS to the perimeter set adds a
+   severity feature for the fires we have polygons for.
+
+   Why it matters: a high-severity fire produces a brighter, longer-lasting
+   thermal anomaly that's easier for FIRMS to detect. This may explain
+   variance the current model can't.
+
+   Cost: one MTBS shapefile join. Half a day.
+
+----------------------------------------------------------------------
+
+5. REPLICATE ON OREGON AND IDAHO
+
+   The 2020 CA fire season was an outlier lightning-siege year and the
+   spatial gap surface (Figure 8 in the memo) partly reflects where 2020
+   happened to burn. Running the identical pipeline on OR + ID would
+   separate the universal "FIRMS misses small fires" finding from the
+   CA-2020-specific spatial structure.
+
+   Why it matters: the single biggest caveat in the memo is "trust the size
+   finding; don't yet trust the spatial specifics." Replication is the only
+   way to lift that caveat.
+
+   Cost: rerun the pipeline against two new bounding boxes. The code is
+   already region-parameterized via `src/config.py:CA_BBOX`. Maybe two
+   weeks of compute + analysis.
+
+----------------------------------------------------------------------
+
+6. MULTI-YEAR (1992–2020) FPA-FOD WINDOW
+
+   The model's spatial structure is currently tested against one year. The
+   FPA-FOD record runs 1992–2020. Re-running with the full window would
+   give per-year cross-validation, test stability across fire regimes, and
+   shrink the fold-to-fold std on the model metrics.
+
+   Why it matters: the v2 vs v1 metric difference is currently borderline
+   (Brier 0.0367 ± 0.0017 vs 0.0381 ± 0.0012). More data is the cheapest
+   way to make that distinction defensible.
+
+   Cost: FIRMS data for 1992–2020 is much larger (the API supports it; the
+   FPA-FOD subset is already available). Pipeline doesn't change.
+
+----------------------------------------------------------------------
+
+7. RE-SAMPLE LANDFIRE WITH NEIGHBORHOOD MODE (from red-team finding)
+
+   61% of FPA-FOD ignitions snap to non-burnable LANDFIRE cells (codes
+   91–99: urban, ag, barren) because the 30 m raster classifies the actual
+   ignition pixel as built environment for human-caused fires in the
+   wildland-urban interface. Re-sample LANDFIRE with a 100 m or 300 m
+   neighborhood mode (most common burnable code within radius) instead of
+   nearest-cell value, OR restrict v3 to lightning-cause ignitions where
+   the WUI-snap problem doesn't apply.
+
+   Why it matters: the v3 null might be a bad-feature null rather than a
+   no-signal null. This test would distinguish.
+
+----------------------------------------------------------------------
+
+8. PROPER VIIRS OVERPASS GEOMETRY (from red-team finding)
+
+   Replace the hardcoded 02:00/14:00 local overpass anchors with the
+   actual overpass times computed per cell-day from the FIRMS pixel
+   `acq_datetime_utc` itself. Also: report `hours_since_overpass`
+   missingness (~22% of fires) and account for sub-cycle precession.
+
+   Why it matters: the `hours_since_overpass` feature is currently
+   "directionally right" but built on simplifications that a hostile
+   reviewer would catch.
+
+----------------------------------------------------------------------
+
+PRIORITY ORDER (my read):
+
+   First:  #2 (NOAA-20) — biggest scientific question, smallest cost
+   Then:   #5 (OR + ID) — lifts the most load-bearing caveat in the memo
+   Then:   #1 (per-pixel latency) — purely data-side, no new sources
+   Then:   #7 (LANDFIRE neighborhood mode) — closes the red-team finding
+   Then:   #3 (real DEM) — addresses the v3=v2 question
+   Then:   #6 (multi-year) — tightens everything else's error bars
+   Last:   #4 (MTBS) — additive but not necessary for any current claim
+   Last:   #8 (overpass geometry) — caveat-shrinking, not result-changing
+
+The first one in the priority list is also the one that would lead the
+conversation with the autonomous-detection alum.
