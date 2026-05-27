@@ -1,5 +1,5 @@
 ---
-title: "Where satellite wildfire detection fails, and where drones add the most marginal value"
+title: "Where satellite wildfire detection fails: a gap analysis"
 subtitle: "FIRMS / VIIRS detection-gap analysis, California, Jun--Nov 2020"
 author: ""
 date: ""
@@ -7,7 +7,7 @@ date: ""
 
 # Headline finding
 
-A California wildfire that gets contained under 10 acres has a **\~97% probability of never producing a coincident FIRMS detection**. For a drone product that closes the resulting gap, the conflation below is fine; for a "satellite detection fails" narrative, it is over-claiming and needs unpacking.
+A California wildfire that gets contained under 10 acres has a **\~97% probability of never producing a coincident FIRMS detection**. That number is the union of two distinct failure modes — see the unpacking below — both of which a reader needs to keep separate before drawing any operational inference.
 
 | Fire size at containment | n | FIRMS detection rate |
 |---|---:|---:|
@@ -22,27 +22,25 @@ Ground truth: FPA-FOD v6 (Short 2022, RDS-2013-0009.6) restricted to California,
 1. *Sensor miss.* VIIRS overpassed the fire while it was burning and the thermal signal was too weak or too brief to fire a pixel.
 2. *Temporal sampling miss.* VIIRS did not overpass the fire while it was burning. Suomi-NPP is a single sun-synchronous satellite (one day + one night equator crossing); at California latitudes a given point gets typically 1--2 distinct overpasses per 24 h. A 90-minute grass fire between overpasses produces no detection regardless of sensor sensitivity.
 
-Both fail the same way from a "did the satellite alert us?" standpoint, and a loitering drone closes both. But the framing matters: the headline is *not* "VIIRS sensors are bad at small fires" — it is "satellites do not alert on small CA fires, for some combination of sensor sensitivity and overpass timing." Separating those would require joining per-fire ignition--containment windows to VIIRS overpass timetables, which is in the next-steps queue.
+Both fail the same way from a "did the satellite alert us?" standpoint. The framing matters: the headline is *not* "VIIRS sensors are bad at small fires" — it is "satellites do not alert on small CA fires, for some combination of sensor sensitivity and overpass timing." Separating those would require joining per-fire ignition--containment windows to VIIRS overpass timetables, which is in the next-steps queue. **What closes the gap — ground-based camera networks, lookouts, faster public reporting, aerial patrol, or some combination — is an open question this analysis does not try to answer.** It quantifies the gap; it does not pick the fill.
 
 **A second caveat that compounds the first.** Fire size at containment is an *outcome*, and detection is a predictor of that outcome — fires that get detected get suppressed faster and stay smaller. So "small fires get missed" and "missed fires stay small" are partly the same arrow, viewed from two sides. The 97% measurement is still correct; the causal phrasing "FIRMS misses *because* fires are small" is not fully defensible from this data alone.
 
 ![Hit rate by NWCG fire-size class. Bars are the share of FPA-FOD records in each bucket for which any FIRMS pixel fell within 3 km / +1 day of the discovery point. Note the buckets here are the standard 9-class NWCG schema, not the 3-bucket schema in the headline table above; the headline's "<10 acres" pools the leftmost three bars (3% / 3% / 6%, weighted) to recover its 3.2% figure.](../figures/hit_rate_by_size.png){ width=100% }
 
-# Decision impact
+# What the gap implies
 
-The question has the same answer for both plausible product directions:
+Two operational implications worth stating plainly, neither of which requires a specific product framing:
 
-- **Loiter / early detection.** Marginal value of a drone over a square kilometer is approximately the satellite-miss probability at that location:
+- **The small-fire detection layer cannot be satellite-only.** FIRMS silence cannot be interpreted as "no fire here" — it is just silence — and given the 97% non-detection rate for small fires, treating it as a real all-clear signal has an unacceptable miss rate at the size of fire that's still small enough to stop.
 
-    $$\text{marginal aerial value}(x) \;=\; 1 - P\!\left(\text{FIRMS detects} \mid x\right).$$
+- **The spatial structure of where the gap is largest is a planning input, not a decision input.** The same per-cell miss probability that drives the model's prediction gives, in aggregate, a map of where the satellite layer is least informative. Useful as a priority signal for any kind of ground- or air-based detection layer; not useful as a basis for any specific basing or coverage decision (see the spatial-replication caveats below).
 
-    The gap surface (Figure 8) is a first-pass priority map for where to base or patrol assets.
+Both rest on a calibrated estimate of the satellite miss probability,
 
-- **Active suppression.** Suppression needs a *trustworthy* ignition trigger. FIRMS does not emit an all-clear signal — it emits silence. But silence is exactly what a triggering pipeline would have to interpret as "no fire here." Given that 97% of CA small fires produce no FIRMS pixel, treating FIRMS silence as evidence of no fire has a ~97% miss rate at the small-fire end. The same gap surface is the surface over which a confirmatory aerial layer must operate.
+$$P_{\text{miss}}(x) \;=\; 1 - P\!\left(\text{FIRMS detects fire} \,\big|\, \text{size, location, season, time-of-day}\right),$$
 
-In both cases the foundation is identical: a calibrated estimate of the satellite miss probability,
-
-$$P_{\text{miss}}(x) \;=\; 1 - P\!\left(\text{FIRMS detects fire} \,\big|\, \text{size, location, season, time-of-day}\right).$$
+which the modeling section quantifies. This memo does not compare the actual options for closing the gap (ground-based camera networks like ALERTCalifornia, mountaintop lookouts, manned patrol aircraft, autonomous loitering platforms, faster public-reporting routing). All of those are filling a gap that this analysis only *measures*.
 
 # Methodology robustness
 
@@ -99,7 +97,7 @@ Of the 110 measurable perimeters, **68 anchor to CAL FIRE's `Started` timestamp*
 
 For the size/latency relationship *inside the catchable subset*, latency increases slightly with perimeter size (median 9 h for 10--100 ac → 21 h for 10k+ ac, pooled). The expected dynamic: a fire that ends at 10k acres started as a sub-VIIRS-detection-threshold ignition and only crossed the detection threshold after substantial growth.
 
-**Implication for a loiter-aircraft pitch:** lean on the 97% non-detection figure, not the 7 h figure. 7 h sounds almost tolerable on a quick read and undersells the case; the 97% is the actual operational gap a drone closes.
+**Which number to quote.** The honest number for "how big is the small-fire detection gap" is the 97% non-detection figure, not the 7 h figure. 7 h sounds almost tolerable on a quick read and dramatically undersells the size of the gap, because it conditions on the easiest sub-population. The 97% is the gap any non-satellite detection layer would actually be addressing.
 
 # Swath-edge geometry --- pixel size matters
 
@@ -114,7 +112,7 @@ We split FIRMS into nadir / mid / edge thirds by pixel area (33rd and 66th perce
 - **Big fires (≥ 1k ac):** edge pixels have a *higher* hit rate (1k--10k: 47% nadir vs **61% edge**; 10k+: 76% vs **81%**). A larger pixel covers more area, so any given fire is more likely to fall under one.
 - **Small fires ($<$ 10 ac):** edge pixels have a *lower* hit rate (1% vs 2%). The same physics that helps for big fires hurts here: larger pixels have a higher per-pixel detection threshold.
 
-This is the textbook detection-vs-resolution trade-off, visible in the data without any model. For an aerial product, it implies that nadir-only filtering *tightens* the FIRMS "no" signal but throws away ~70% of detections; for small-fire alerting, ignoring edge pixels is the right call because they contribute almost nothing.
+This is the textbook detection-vs-resolution trade-off, visible in the data without any model. For any downstream system that treats FIRMS as input, nadir-only filtering *tightens* the FIRMS "no" signal but throws away ~70% of detections; for small-fire alerting, ignoring edge pixels is the right call because they contribute almost nothing.
 
 # Modeling the gap
 
@@ -170,13 +168,13 @@ on a 0.1° latitude/longitude grid covering California, where $x$ is the cell's 
 
 A note on $\hat{P}$: the predicted-probability function plotted here is v3 (the most feature-complete model — terrain + fuel + everything v1 has), not v1. This is intentional and is *not* a contradiction of the v1-for-deployment recommendation in the modeling section. The map is a *visualization* of where the model expects the gap to be largest under a hypothetical 1-acre fire; visualizing requires the richest set of spatial inputs available, even if those inputs don't move the held-out metric. For an actual deployed *alerting threshold* the calibration in the 10–20% probability band matters more than gap-surface texture, and v1 is the right choice there. The two recommendations are about two different operational uses.
 
-![Predicted marginal aerial value (1 -- P(FIRMS detects)) across CA on a 0.1$^\circ$ grid, three scenarios. Predictions are mixed over the 2020 CA cause distribution (rather than conditioned on a single cause). Light = high gap (drones add value); dark = low gap (FIRMS likely catches it).](../figures/gap_surface.png){ width=100% }
+![Predicted satellite miss probability (1 -- P(FIRMS detects)) across CA on a 0.1$^\circ$ grid, three scenarios. Predictions are mixed over the 2020 CA cause distribution (rather than conditioned on a single cause). Light = high miss probability (satellite layer least informative); dark = low miss probability (FIRMS likely catches it).](../figures/gap_surface.png){ width=100% }
 
 The 1-acre map is uniformly high (median 0.98) --- VIIRS rarely catches small fires anywhere. **The lever is detecting fires that haven't grown yet.** The morning vs.\ afternoon 1-acre panels are nearly identical (median gaps 0.97 vs.\ 0.98); the model finds no operationally meaningful time-of-day effect at this size, so both panels are kept here only to show that the headline is not a single-scenario artifact.
 
-For 100-acre fires the surface separates by terrain: the Klamath / Trinity Alps and the northern Sierra--Cascades show high gap (FIRMS will probably miss), while the Central Valley and southern basins show low gap (FIRMS catches them). Detection failures concentrate in the heavily forested, high-elevation interior --- exactly where ground-based detection is also hardest.
+For 100-acre fires the surface separates by terrain: the Klamath / Trinity Alps and the northern Sierra--Cascades show high miss probability (FIRMS will probably miss), while the Central Valley and southern basins show low miss probability (FIRMS catches them). Detection failures concentrate in the heavily forested, high-elevation interior --- exactly where ground-based detection is also hardest.
 
-**Trust the size finding; do not yet trust the spatial specifics.** 2020 was an outlier lightning-siege year for California — most of the season's big fires concentrated in the northern interior. The "FIRMS misses small fires" headline is a sensor-physics result and is almost certainly universal. The shape of the 100-acre gap surface, in contrast, partly reflects *where 2020 happened to burn*, and the Klamath / Sierra story should not be used as a basing decision until the same pipeline is run on Oregon and Idaho, or on a 5+ year CA window, and the spatial structure replicates. A founder reading Figure 8 to choose where to position aircraft is reading exactly the layer this dataset cannot defend yet.
+**Trust the size finding; do not yet trust the spatial specifics.** 2020 was an outlier lightning-siege year for California — most of the season's big fires concentrated in the northern interior. The "FIRMS misses small fires" headline is a sensor-physics result and is almost certainly universal. The shape of the 100-acre miss-probability surface, in contrast, partly reflects *where 2020 happened to burn*, and the Klamath / Sierra story should not be used as a basis for any specific detection-infrastructure decision until the pipeline is run on Oregon and Idaho, or on a 5+ year CA window, and the spatial structure replicates. Anyone reading Figure 8 to inform a specific coverage or basing decision is reading exactly the layer this dataset cannot defend yet.
 
 ![Spatial distribution of FIRMS hits vs.\ misses across California, split by fire size. Small-fire misses cover the state; the small-fire *hits* (left panel, blue) cluster visibly, and that clustering is the same mega-fire-polygon co-location effect diagnosed in the polygon-vs-centroid section above — a small ignition inside a mega-fire's burn polygon picks up the mega-fire's pixels and gets credited as a hit. Medium/large-fire misses (right panel) concentrate along the Coast Range and Sierra--Cascade interior.](../figures/miss_map.png){ width=100% }
 
@@ -186,5 +184,6 @@ For 100-acre fires the surface separates by terrain: the Klamath / Trinity Alps 
 - **FPA-FOD coordinates are noisy.** The 174k-acre Castle Fire (2020) shows up at 34.95$^\circ$N / -118.93$^\circ$W, ~130 km from the actual burn perimeter in Sequoia NF. The polygon-match approach above resolves this case; centroid-radius cannot.
 - **FPA-FOD covers 1992--2020 only.** Extending past 2020 requires a different ground-truth source (MTBS, ICS-209, or CAL FIRE perimeters).
 - **Elevation feature is from a ~500 m neighbor offset on SRTM via Open-Elevation**, not a proper 30 m USGS 3DEP raster. The slope estimates are fine for "is it mountainous"; coarse for "is this a steep canyon."
-- **Single-year, single-region — the load-bearing caveat.** 2020 was an outlier lightning-siege year for California; most of the season's burned acreage concentrated in the northern interior. The size-by-detection-rate finding (3.2% / 25% / 80%) is a sensor-physics result and is robust. The *spatial* gap-surface specifics — the Klamath / Sierra / Trinity hot-zones in Figure 8 — partly reflect where 2020 happened to burn and should not be acted on (e.g.\ for aircraft basing) until the pipeline replicates on Oregon and Idaho or on a 5+ year CA window.
+- **Single-year, single-region — the load-bearing caveat.** 2020 was an outlier lightning-siege year for California; most of the season's burned acreage concentrated in the northern interior. The size-by-detection-rate finding (3.2% / 25% / 80%) is a sensor-physics result and is robust. The *spatial* miss-probability specifics — the Klamath / Sierra / Trinity hot-zones in Figure 8 — partly reflect where 2020 happened to burn and should not be acted on for any specific basing or coverage decision until the pipeline replicates on Oregon and Idaho or on a 5+ year CA window.
+- **The memo measures the gap; it does not pick the fill.** A complete operational read would compare the satellite-only baseline against ALERTCalifornia mountaintop camera coverage, lookout-tower viewsheds, manned CAL FIRE patrol aircraft, public-reporting routing, and aerial loiter platforms — and would quote unit economics, not just detection rates. None of that work is in this analysis. The numbers here describe a real and measurable hole in satellite-only detection; the choice of what fills the hole is downstream.
 

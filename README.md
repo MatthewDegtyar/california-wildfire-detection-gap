@@ -1,6 +1,6 @@
 # California wildfire detection gap
 
-Where NASA FIRMS / VIIRS satellite wildfire detection fails for California, and therefore where aerial detection (drones, persistent loiter) adds the most marginal value.
+How often satellite-based wildfire detection (NASA FIRMS / VIIRS VNP14) fails in California, by fire size and location. The repo measures the gap; it does not pick what fills it.
 
 ## Headline
 
@@ -73,7 +73,8 @@ whats_next.txt        v2 punch list (pulled from the memo before publication)
 
 - **Single year, single region.** 2020 was an outlier lightning-siege year for CA. The size-by-detection finding is sensor physics and is robust; the *spatial* gap-surface specifics (Klamath / Sierra hot-zones) partly reflect where 2020 happened to burn and should not drive any operational decision until the pipeline replicates on Oregon and Idaho.
 - **"Hit" means "any FIRMS pixel within 3 km / +1 day," not "FIRMS correctly identified this fire."** Two fires within a few km can both be credited as hits in the centroid-radius envelope; the polygon-matched subset is the stricter measurement and is reported separately.
-- **The 97% combines sensor miss with overpass-sampling miss.** Suomi-NPP gives a given CA point 1–2 distinct overpasses per day; a 90-minute grass fire between overpasses produces no detection regardless of sensor sensitivity. Operationally these collapse into the same gap (a loitering drone closes both); the framing matters for any "the sensor is bad" narrative.
+- **The 97% combines sensor miss with overpass-sampling miss.** Suomi-NPP gives a given CA point 1–2 distinct overpasses per day; a 90-minute grass fire between overpasses produces no detection regardless of sensor sensitivity. Operationally these collapse into the same gap; the framing matters for any "the sensor is bad" narrative.
+- **This memo does not compare the options for closing the gap.** Ground-based camera networks (ALERTCalifornia), lookout towers, manned patrol aircraft, public-reporting routing, and autonomous loiter platforms are all candidates and none is evaluated against the others here. The work measures the hole; choosing the fill is downstream.
 - **The LANDFIRE fuel feature is suspect on inspection.** 61% of FPA-FOD ignitions snap to non-burnable LANDFIRE cells because human-caused fires cluster in the urban-wildland interface. The v3 (terrain+fuel) null result may be a bad-feature null rather than a no-signal null.
 - **All other caveats are in the memo's "Honest limitations" section.**
 

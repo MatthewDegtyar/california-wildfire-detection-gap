@@ -172,8 +172,8 @@ def fig_gap_surface():
             ax.set_ylabel("Latitude")
 
     cbar = fig.colorbar(im, ax=axes.ravel().tolist(), shrink=0.85,
-                        label="Marginal aerial value  (= 1 - P(FIRMS detects))")
-    fig.suptitle("Where do drones add the most marginal detection value?  (California)")
+                        label="Satellite miss probability  (= 1 - P(FIRMS detects))")
+    fig.suptitle("Where is the satellite detection layer least informative?  (California)")
     out = FIG_DIR / "gap_surface.png"
     fig.savefig(out, dpi=150, bbox_inches="tight")
     plt.close(fig)
@@ -357,7 +357,7 @@ def fig_gap_surface_v2():
         if ax is axes[0]:
             ax.set_ylabel("Latitude")
 
-    fig.suptitle("Predicted marginal aerial value across California\n"
+    fig.suptitle("Predicted satellite miss probability across California\n"
                  f"(peak-season ignition; {title_suffix})", fontsize=14)
 
     # Reserve a horizontal strip at the bottom for the colorbar; leave enough
@@ -366,7 +366,7 @@ def fig_gap_surface_v2():
     fig.subplots_adjust(left=0.06, right=0.98, top=0.88, bottom=0.22, wspace=0.10)
     cbar_ax = fig.add_axes([0.20, 0.11, 0.60, 0.025])  # [left, bottom, width, height]
     cbar = fig.colorbar(im, cax=cbar_ax, orientation="horizontal")
-    cbar.set_label("Marginal aerial value  (= 1 − P(FIRMS detects))", fontsize=12, labelpad=6)
+    cbar.set_label("Satellite miss probability  (= 1 − P(FIRMS detects))", fontsize=12, labelpad=6)
 
     out = FIG_DIR / "gap_surface.png"
     fig.savefig(out, dpi=150)

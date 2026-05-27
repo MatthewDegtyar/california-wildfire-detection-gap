@@ -16,8 +16,9 @@ null result. These are the natural next moves.
 
    Why it matters: separates the "FIRMS misses small fires" finding (sensor
    sensitivity) from the "FIRMS sees big fires late" finding (overpass +
-   thermal-signature growth). A founder thinking about loiter aircraft cares
-   most about the latency story for the catchable-fire subset.
+   thermal-signature growth). Anyone evaluating an aerial or ground-based
+   fill for the satellite gap needs the latency story for the catchable-fire
+   subset broken out cleanly from the size-of-fire story.
 
 ----------------------------------------------------------------------
 
@@ -26,13 +27,16 @@ null result. These are the natural next moves.
    A second sensor on a different sun-synchronous orbit halves the overpass
    gap, especially for the Sierra east slope afternoon coverage. Re-running
    the whole pipeline with the union of Suomi-NPP + NOAA-20 detections would
-   re-compute the marginal-value math.
+   re-compute the measured satellite-only baseline against which any
+   alternative detection layer should be compared.
 
-   Why it matters: this is the *one* question that matters most for the
-   aerial value proposition. If NOAA-20 alone closes most of the gap, the
-   case for loiter aircraft erodes. If it doesn't, the case strengthens.
-   This is the question to lead with for a peer-level conversation with
-   anyone who works on autonomous detection.
+   Why it matters: this is the single biggest question for whether the
+   satellite layer ALONE can be made adequate, or whether the gap is
+   structural. If NOAA-20 closes most of the gap, the case for any
+   non-satellite fill (cameras, lookouts, aerial, etc.) shrinks
+   accordingly. If it doesn't, the gap is real beyond any single-sensor
+   limitation and the conversation moves to which fill is most cost-
+   effective.
 
    Cost: one additional fetch from the FIRMS API (same endpoint, different
    `source` parameter). Maybe one day of pipeline updates.

@@ -2,21 +2,27 @@
 LINKEDIN POST (paste as-is)
 ═══════════════════════════════════════════════════════════════════════
 
-Where NASA's FIRMS satellite wildfire product fails — California, 2020 fire season:
+Spent a few weeks looking at how often satellites actually catch California wildfires. What I found:
 
-- < 10 ac fires: 3% detection rate (and these are 93% of all CA fires)
-- 10–1,000 ac: 25%
-- ≥ 1,000 ac: 80%
+→ Satellites never see 97% of California wildfires that get contained under 10 acres — and those small fires are 93% of all California fires in a year.
 
-The gap below 10 acres is the addressable market for drones / loiter aircraft.
+→ Even when satellites do catch a fire, they're about 7 hours late on average, and that's only for the biggest, most notable ones. By the time anyone gets an alert, half a day of fire growth has already happened.
 
-Write-up + code: github.com/MatthewDegtyar/california-wildfire-detection-gap
+→ The gap has two causes: satellites can't see a small fire's heat signature even when looking, AND the satellite only passes over any given spot in California once or twice a day.
+
+→ I built a map of where the blind spots cluster across the state — the heavily forested northern interior. The general finding (satellites miss small fires) is rock solid. The specific map needs more years and more states before anyone bets a real decision on it; 2020 was an unusual fire year for CA.
+
+→ The takeaway: there's a real, measurable detection gap in the size range where fires are still small enough to stop. Whatever closes that gap — cameras, lookouts, faster public reporting, aerial patrol, some combination — is filling an operational hole that satellite-only systems demonstrably can't.
+
+Code + 12-page write-up: github.com/MatthewDegtyar/california-wildfire-detection-gap
+
+#wildfire #california
 
 
 ═══════════════════════════════════════════════════════════════════════
 IMAGES (in linkedin_images/)
 ═══════════════════════════════════════════════════════════════════════
 
-1. 1_hit_rate_by_size.png  — bar chart of the breakdown above
-2. 2_gap_surface.png       — CA map of where the gap is largest
-3. 3_latency.png           — optional 3rd: latency distribution
+1. 1_hit_rate_by_size.png  — chart of satellite detection rate by fire size
+2. 2_gap_surface.png       — map of where the gap is largest across CA
+3. 3_latency.png           — optional 3rd: how late satellite alerts arrive
