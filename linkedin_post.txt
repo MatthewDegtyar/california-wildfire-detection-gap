@@ -2,35 +2,21 @@
 LINKEDIN POST (paste as-is)
 ═══════════════════════════════════════════════════════════════════════
 
-97% of California wildfires contained under 10 acres never produce a single FIRMS satellite detection.
+Where NASA's FIRMS satellite wildfire product fails — California, 2020 fire season:
 
-I quantified where satellite wildfire detection fails across the 2020 CA fire season, and therefore where aerial detection (drones, persistent loiter) adds the most marginal value.
+- < 10 ac fires: 3% detection rate (and these are 93% of all CA fires)
+- 10–1,000 ac: 25%
+- ≥ 1,000 ac: 80%
 
-Methodology, calibrated model, gap-surface map, and the 12-page write-up:
-github.com/MatthewDegtyar/california-wildfire-detection-gap
+The gap below 10 acres is the addressable market for drones / loiter aircraft.
 
-If you work in fire detection or autonomous aerial, I'd love to compare notes.
-
-#wildfire #remotesensing #drones
-
-
-═══════════════════════════════════════════════════════════════════════
-IMAGES (in linkedin_images/, in upload order)
-═══════════════════════════════════════════════════════════════════════
-
-1. 1_hit_rate_by_size.png  — the headline bar chart
-2. 2_gap_surface.png       — the cause-mix-weighted CA gap surface
-3. 3_latency.png           — latency distribution (optional 3rd)
+Write-up + code: github.com/MatthewDegtyar/california-wildfire-detection-gap
 
 
 ═══════════════════════════════════════════════════════════════════════
-NOTES
+IMAGES (in linkedin_images/)
 ═══════════════════════════════════════════════════════════════════════
 
-- The repo URL is in the body (not the first comment) because the post
-  is short enough that LinkedIn won't down-rank it. The first-comment
-  trick matters for long posts where the algorithm reads external links
-  as "trying to redirect off-platform."
-- Hook lands above the fold even on mobile (under 210 chars).
-- Do not tag the alum in the post. The post is a portfolio piece you
-  can link to in a DM; the DM is the actual outreach.
+1. 1_hit_rate_by_size.png  — bar chart of the breakdown above
+2. 2_gap_surface.png       — CA map of where the gap is largest
+3. 3_latency.png           — optional 3rd: latency distribution
