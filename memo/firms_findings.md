@@ -26,7 +26,7 @@ Both fail the same way from a "did the satellite alert us?" standpoint, and a lo
 
 **A second caveat that compounds the first.** Fire size at containment is an *outcome*, and detection is a predictor of that outcome — fires that get detected get suppressed faster and stay smaller. So "small fires get missed" and "missed fires stay small" are partly the same arrow, viewed from two sides. The 97% measurement is still correct; the causal phrasing "FIRMS misses *because* fires are small" is not fully defensible from this data alone.
 
-![Hit rate by NWCG fire-size class. Bars are the share of FPA-FOD records in each bucket for which any FIRMS pixel fell within 3 km / +1 day of the discovery point.](../figures/hit_rate_by_size.png){ width=100% }
+![Hit rate by NWCG fire-size class. Bars are the share of FPA-FOD records in each bucket for which any FIRMS pixel fell within 3 km / +1 day of the discovery point. Note the buckets here are the standard 9-class NWCG schema, not the 3-bucket schema in the headline table above; the headline's "<10 acres" pools the leftmost three bars (3% / 3% / 6%, weighted) to recover its 3.2% figure.](../figures/hit_rate_by_size.png){ width=100% }
 
 # Decision impact
 
@@ -67,9 +67,13 @@ For the 268 FPA-FOD fires that fall inside a 2020 NIFC burn perimeter, we can re
 | 10k+ | 23 | 96% | **100%** | $+4$ pp |
 | **All** | **268** | **41%** | **51%** | $+10$ pp |
 
-Two opposite effects fight each other. At the small end, the polygon method *catches* fires the centroid envelope missed: many under-10-acre records sit just outside the eventual burn polygon of a 2020 mega-fire, and a FIRMS pixel inside that polygon during the fire's active window credibly evidences detection. At the middle bucket (10--1k acres), the polygon method is *stricter*: the centroid envelope was over-crediting hits from nearby fires whose pixels happened to lie within 3 km but weren't actually inside this fire's polygon. At the top end, the polygon method recovers the Castle-Fire-style cases where the FPA-FOD coordinate is offset ~130 km from the actual burn (96% → 100%).
+Two opposite effects fight each other. At the **middle bucket (10--1k acres)**, the polygon method is *stricter*: the centroid envelope was over-crediting hits from nearby fires whose pixels happened to lie within 3 km but weren't actually inside this fire's polygon. At the **top end**, the polygon method recovers the Castle-Fire-style cases where the FPA-FOD coordinate is offset ~130 km from the actual burn (96% → 100%).
+
+The **small end (<10 ac) jump from 13% → 39% is the least trustworthy cell in the table** and should not be read as "polygon matching shows FIRMS actually catches small fires four times more often than we thought." What is mostly happening here: a 1-acre ignition sits inside a mega-fire's eventual burn polygon, the mega-fire fires hundreds of FIRMS pixels over its multi-week active period, and the small fire gets credited as "detected" because of pixels that are almost certainly from the mega-fire, not from the 1-acre ignition itself. The temporal-window filter (each small fire is matched only to FIRMS pixels within its own discovery + 14 day window) cuts the worst of this, but it does not fully separate small-fire detection from mega-fire detection inside a shared polygon. Read this cell as an upper bound on small-fire detection within the polygon-overlapping subset, not as evidence of substantive small-fire detection.
 
 Net effect: $+10$ pp lift on the polygon-matchable subset. The headline tables use the centroid-radius numbers across the full 7,500 fires for comparability with the prior literature; the polygon match is the more trustworthy measurement when a perimeter exists.
+
+**A reader will notice the headline says small fires are detected 3.2% of the time and this table says 39%, and that needs reconciling explicitly.** These two numbers are not in conflict, because the populations are different: the 3.2% is over **all 6,939 small CA fires in 2020**, while the 39% is over the **143-fire subset of small fires that happened to fall inside a 2020 burn perimeter**. That subset is heavily selected — it is mostly small fires that ignited inside what became a mega-fire's eventual footprint, where (as flagged above) the detection credit may belong to the mega-fire's pixels. The 3.2% is the right number for the addressable-market read; the 39% is a methodology-comparison number, not a substitute for it.
 
 # Detection latency, when FIRMS does see the fire
 
@@ -87,15 +91,15 @@ Of the 110 measurable perimeters, **68 anchor to CAL FIRE's `Started` timestamp*
 
 ![Distribution of FIRMS detection latency for CA 2020 perimeters (n = 110). Left: histogram, log-x. Right: latency by perimeter size. Most of the high-latency tail sits in the FPA-FOD-anchored subset, where midnight-UTC discovery dates inflate the apparent delay.](../figures/latency.png){ width=100% }
 
-**What 7 h actually describes, and what it does not.** The CAL-FIRE-anchored subset is the trustworthy number, but it over-represents *exactly the fires VIIRS is good at catching* — incidents large enough or notable enough to make CAL FIRE's published incident list. Read carefully:
+**The 7 h figure is not a population latency estimate. Read it carefully or don't quote it.** The CAL-FIRE-anchored subset is filtered twice in the direction of fires VIIRS handles well: (a) FIRMS had to fire a pixel inside the perimeter at all, and (b) the fire had to be notable enough that CAL FIRE published an incident record with an `Started` timestamp. Both filters select toward exactly the same sub-population — fires that grew into the multi-hundred-acre-plus regime. So:
 
-- The 7 h median is the latency *floor*, conditional on the fire eventually being notable enough that CAL FIRE recorded an alarm timestamp. These are mostly fires that grew into the multi-hundred-acre-plus regime.
-- For the small fires this whole memo is about (the 92.5% under 10 ac), latency is **effectively infinite**: 97% of them were never detected at all, and the other 3% sit in the noisy FPA-FOD-only subset.
-- The 15.8 h pooled median is biased upward by the FPA-FOD date-truncation, but it is also still mostly conditioning on the subset of fires that *had* a FIRMS detection. The right framing is two-tier: *"For fires VIIRS will catch, the median delay is 7--16 h. For the small fires the headline is about, there is no detection to time."*
+- The 7 h median is best understood as a **latency floor for the easiest sub-population** — large, notable, already-burning, in CAL FIRE's incident database. It is not the latency anyone operationally interesting (a small early ignition) would experience.
+- For the small-fire 92.5% the memo's headline is about, the right number is the 97% non-detection figure, not 7 h. There is no detection to time for the fires that matter most.
+- The 15.8 h pooled median has the same survivorship issue plus extra noise from FPA-FOD date-truncation. It is not a better number than 7 h; it is the same conditional number with more noise.
 
-For the size/latency relationship inside the catchable subset, latency *increases* slightly with perimeter size (median 9 h for 10--100 ac → 21 h for 10k+ ac, pooled). This is the expected dynamic: a fire that ends at 10k acres usually started as a sub-VIIRS-detection-threshold ignition and only crossed the detection threshold after substantial growth.
+For the size/latency relationship *inside the catchable subset*, latency increases slightly with perimeter size (median 9 h for 10--100 ac → 21 h for 10k+ ac, pooled). The expected dynamic: a fire that ends at 10k acres started as a sub-VIIRS-detection-threshold ignition and only crossed the detection threshold after substantial growth.
 
-A loiter-aircraft pitch should say *both* things: it closes the 7-hour window for fires VIIRS would have eventually caught, and it provides the only detection layer at all for the small-fire 97%.
+**Implication for a loiter-aircraft pitch:** lean on the 97% non-detection figure, not the 7 h figure. 7 h sounds almost tolerable on a quick read and undersells the case; the 97% is the actual operational gap a drone closes.
 
 # Swath-edge geometry --- pixel size matters
 
@@ -131,7 +135,7 @@ All metrics are computed *per fold* on a 5-fold stratified split (same `RNG=0` a
 | **GBM v2 (+\ elevation)** | **0.0367 ± 0.0017** | **0.148 ± 0.006** | **0.843 ± 0.017** |
 | GBM v3 (+\ terrain + fuel) | 0.0370 ± 0.0013 | 0.148 ± 0.004 | 0.844 ± 0.017 |
 
-(`constant_no` and `base_rate` show 0.0000 std because they are deterministic over the same data — Brier is pooled across folds but does not depend on fold structure. The Brier of "predict no" equals the empirical positive rate; the log-loss spike to 0.755 vs.\ 0.212 for "predict base rate" is purely a calibration penalty for putting probability mass at zero when the truth is sometimes one — they do not disagree on whether the model is useful, only on whether it is *calibrated*.)
+`constant_no` and `base_rate` show 0.0000 std because they are deterministic on the same data; Brier is pooled across folds but does not depend on fold structure. The Brier of "predict no" equals the empirical positive rate (0.0547). The log-loss spike from 0.212 ("predict base rate") to 0.755 ("predict no") is purely a calibration penalty for putting probability mass at zero when the truth is sometimes one. Brier and log-loss do not disagree on whether the model is useful, only on whether it is *calibrated*.
 
 \clearpage
 
@@ -139,9 +143,9 @@ All metrics are computed *per fold* on a 5-fold stratified split (same `RNG=0` a
 
 \clearpage
 
-The size-class baseline is strong; it captures the dominant signal (small fires get missed). The v1 GBM clears it cleanly: Brier 0.0381 ± 0.0012 vs 0.0418 ± 0.0014, AUC 0.838 ± 0.029 vs 0.725 ± 0.040. The continuous features (size, lat/lon, season, time-of-day, hours-since-overpass) buy real lift.
+The size-class baseline is strong; it captures the dominant signal (small fires get missed). The v1 GBM clears it cleanly: Brier 0.0381 ± 0.0012 vs 0.0418 ± 0.0014, AUC 0.838 ± 0.029 vs 0.725 ± 0.040. The continuous features (size, lat/lon, season, time-of-day) buy real lift.
 
-(Caveat on the `hours_since_overpass` feature: it is computed from FPA-FOD `DISCOVERY_TIME`, which is missing in ~22% of records, and is built against a hardcoded Suomi-NPP overpass schedule of 02:00 / 14:00 local — an approximation of the actual orbit, which precesses over time and whose local-overpass time varies by several minutes across CA latitudes. A proper version would compute the overpass timetable per cell from the FIRMS pixel timestamps themselves. The feature is included because it is directionally right; it should not be read as a high-fidelity sensor-timing model.)
+The `hours_since_overpass` feature was included in the v1 spec but is built on a hardcoded 02:00 / 14:00 local schedule and is NaN for ~22% of records (those without FPA-FOD `DISCOVERY_TIME`). Because the feature is low-fidelity by construction, we ran an explicit ablation: a v1 GBM with `hours_since_overpass` removed. The ablated model is **not worse** — Brier 0.0370 ± 0.0010, log-loss 0.149 ± 0.004, AUC 0.840 ± 0.022 — actually a touch better than the full v1 on Brier, indistinguishable on AUC. The lift over the size-class baseline survives the ablation cleanly. So the "continuous features buy real lift" claim is safe; the lift comes from `log_size`, `LATITUDE`, `LONGITUDE`, and the `sin_doy`/`cos_doy` seasonality, not from the hardcoded overpass schedule.
 
 **v2 (+ elevation) and v1 are statistically indistinguishable on this dataset.** Brier 0.0367 ± 0.0017 vs 0.0381 ± 0.0012 — a 0.0014 gap with ±1σ bands that overlap. Either model is defensible as headline; we keep v2 nominal because elevation is a sensible physical predictor of detection probability and the point estimate is the right side of v1, but a sceptical reader is entitled to call this a coin flip on the metric. (We avoid the otherwise-tempting argument "v2's gap surface looks more terrain-shaped, therefore v2 is better." A model can produce more spatially-structured output because it is picking up real signal *or* because it is overfitting to elevation; the held-out metric does not distinguish those, so neither do we.)
 
@@ -166,11 +170,11 @@ on a 0.1° latitude/longitude grid covering California, where $x$ is the cell's 
 
 ![Predicted marginal aerial value (1 -- P(FIRMS detects)) across CA on a 0.1$^\circ$ grid, three scenarios. Predictions are mixed over the 2020 CA cause distribution (rather than conditioned on a single cause). Light = high gap (drones add value); dark = low gap (FIRMS likely catches it).](../figures/gap_surface.png){ width=100% }
 
-The 1-acre map is uniformly high (median 0.98) --- VIIRS rarely catches small fires anywhere. **The lever is detecting fires that haven't grown yet.**
+The 1-acre map is uniformly high (median 0.98) --- VIIRS rarely catches small fires anywhere. **The lever is detecting fires that haven't grown yet.** The morning vs.\ afternoon 1-acre panels are nearly identical (median gaps 0.97 vs.\ 0.98); the model finds no operationally meaningful time-of-day effect at this size, so both panels are kept here only to show that the headline is not a single-scenario artifact.
 
 For 100-acre fires the surface separates by terrain: the Klamath / Trinity Alps and the northern Sierra--Cascades show high gap (FIRMS will probably miss), while the Central Valley and southern basins show low gap (FIRMS catches them). Detection failures concentrate in the heavily forested, high-elevation interior --- exactly where ground-based detection is also hardest.
 
-**Trust the size finding; do not yet trust the spatial specifics.** 2020 was an outlier lightning-siege year for California — most of the season's big fires concentrated in the northern interior. The "FIRMS misses small fires" headline is a sensor-physics result and is almost certainly universal. The shape of the 100-acre gap surface, in contrast, partly reflects *where 2020 happened to burn*, and the Klamath / Sierra story should not be used as a basing decision until the same pipeline is run on Oregon and Idaho (or a multi-year CA window) and the spatial structure replicates. A founder reading Figure 8 to choose where to position aircraft is reading exactly the layer this dataset cannot defend yet.
+**Trust the size finding; do not yet trust the spatial specifics.** 2020 was an outlier lightning-siege year for California — most of the season's big fires concentrated in the northern interior. The "FIRMS misses small fires" headline is a sensor-physics result and is almost certainly universal. The shape of the 100-acre gap surface, in contrast, partly reflects *where 2020 happened to burn*, and the Klamath / Sierra story should not be used as a basing decision until the same pipeline is run on Oregon and Idaho, or on a 5+ year CA window, and the spatial structure replicates. A founder reading Figure 8 to choose where to position aircraft is reading exactly the layer this dataset cannot defend yet.
 
 ![Spatial distribution of FIRMS hits vs.\ misses across California, split by fire size. Small-fire misses cover the state; medium/large-fire misses concentrate along the Coast Range and Sierra--Cascade interior.](../figures/miss_map.png){ width=100% }
 
