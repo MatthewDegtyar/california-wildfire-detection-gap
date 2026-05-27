@@ -1,9 +1,11 @@
 ---
-title: "Where satellite wildfire detection fails: a gap analysis"
-subtitle: "FIRMS / VIIRS detection-gap analysis, California, Jun--Nov 2020"
+title: "An open-data analysis of public satellite wildfire detection in California"
+subtitle: "FIRMS / VIIRS gap analysis, 2020 fire season"
 author: ""
 date: ""
 ---
+
+This is an open-data portfolio analysis on a single publicly available product (NASA FIRMS / VIIRS VNP14) for one fire season in one state. It is *not* a survey of satellite-based wildfire detection more broadly. Commercial thermal-imaging constellations (OroraTech, Constellr, the FireSat constellation from Muon Space + Earth Fire Alliance launching in 2026) are explicitly being built to close the gap this analysis measures, and several are already operational. They are out of scope here. The work below is about what the publicly available data product shows; the broader landscape question of whether satellites *as a category* can do this is not what this memo answers.
 
 # Headline finding
 
@@ -185,5 +187,6 @@ For 100-acre fires the surface separates by terrain: the Klamath / Trinity Alps 
 - **FPA-FOD covers 1992--2020 only.** Extending past 2020 requires a different ground-truth source (MTBS, ICS-209, or CAL FIRE perimeters).
 - **Elevation feature is from a ~500 m neighbor offset on SRTM via Open-Elevation**, not a proper 30 m USGS 3DEP raster. The slope estimates are fine for "is it mountainous"; coarse for "is this a steep canyon."
 - **Single-year, single-region — the load-bearing caveat.** 2020 was an outlier lightning-siege year for California; most of the season's burned acreage concentrated in the northern interior. The size-by-detection-rate finding (3.2% / 25% / 80%) is a sensor-physics result and is robust. The *spatial* miss-probability specifics — the Klamath / Sierra / Trinity hot-zones in Figure 8 — partly reflect where 2020 happened to burn and should not be acted on for any specific basing or coverage decision until the pipeline replicates on Oregon and Idaho or on a 5+ year CA window.
-- **The memo measures the gap; it does not pick the fill.** A complete operational read would compare the satellite-only baseline against ALERTCalifornia mountaintop camera coverage, lookout-tower viewsheds, manned CAL FIRE patrol aircraft, public-reporting routing, and aerial loiter platforms — and would quote unit economics, not just detection rates. None of that work is in this analysis. The numbers here describe a real and measurable hole in satellite-only detection; the choice of what fills the hole is downstream.
+- **Open-data scope only.** This memo analyzes a single publicly available NASA product (FIRMS / VIIRS) for one fire season. Commercial thermal-imaging constellations (OroraTech, Constellr, FireSat from Muon Space + Earth Fire Alliance) target the same gap and are operational or launching in 2026 — none of them are evaluated here. No claim about satellite-based detection *in general* is supported by this work, only about the standard public product fire agencies have historically relied on.
+- **The memo measures the gap in the public product; it does not pick what fills it.** A complete operational read would compare the standard public-product baseline against ALERTCalifornia mountaintop camera coverage, lookout-tower viewsheds, manned CAL FIRE patrol aircraft, public-reporting routing, commercial sat constellations, and aerial loiter platforms, and would quote unit economics, not just detection rates. None of that work is in this analysis.
 

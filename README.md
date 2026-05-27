@@ -1,6 +1,10 @@
-# California wildfire detection gap
+# California wildfire detection gap — an open-data analysis
 
-How often satellite-based wildfire detection (NASA FIRMS / VIIRS VNP14) fails in California, by fire size and location. The repo measures the gap; it does not pick what fills it.
+An end-to-end portfolio data analysis on a single open dataset: how often does the standard public satellite wildfire detection product (NASA FIRMS / VIIRS VNP14) actually catch California wildfires in the 2020 fire season?
+
+**This is intentionally scoped to one publicly available product.** It is *not* a survey of the satellite wildfire-detection landscape. Commercial thermal-imaging constellations (OroraTech, Constellr, the upcoming FireSat constellation from Muon Space + Earth Fire Alliance) are being built explicitly to address exactly the gaps this analysis measures, and several are operational or launching in 2026. Anything the analysis does not test is out of scope.
+
+The point of the work is the pipeline: data acquisition, multi-source ground-truth joins, calibrated modeling with honest uncertainty, and a written-up findings document that owns its limitations.
 
 ## Headline
 
@@ -71,10 +75,10 @@ whats_next.txt        v2 punch list (pulled from the memo before publication)
 
 ## Honest caveats (read these before quoting any number)
 
-- **Single year, single region.** 2020 was an outlier lightning-siege year for CA. The size-by-detection finding is sensor physics and is robust; the *spatial* gap-surface specifics (Klamath / Sierra hot-zones) partly reflect where 2020 happened to burn and should not drive any operational decision until the pipeline replicates on Oregon and Idaho.
+- **Open-data scope, not industry scope.** This analyzes one publicly available NASA product (FIRMS / VIIRS) on one fire season in one state. Commercial thermal-imaging constellations (OroraTech, Constellr, FireSat) explicitly target the same gap this measures and are operational or launching in 2026. No claim about the satellite industry as a whole is supported here, only about the public product agencies have historically relied on.
+- **Single year, single region.** 2020 was an outlier lightning-siege year for CA. The size-by-detection finding is sensor physics and is robust within this dataset; the *spatial* gap-surface specifics (Klamath / Sierra hot-zones) partly reflect where 2020 happened to burn and should not drive any operational decision until the pipeline replicates on Oregon and Idaho or a multi-year CA window.
 - **"Hit" means "any FIRMS pixel within 3 km / +1 day," not "FIRMS correctly identified this fire."** Two fires within a few km can both be credited as hits in the centroid-radius envelope; the polygon-matched subset is the stricter measurement and is reported separately.
-- **The 97% combines sensor miss with overpass-sampling miss.** Suomi-NPP gives a given CA point 1–2 distinct overpasses per day; a 90-minute grass fire between overpasses produces no detection regardless of sensor sensitivity. Operationally these collapse into the same gap; the framing matters for any "the sensor is bad" narrative.
-- **This memo does not compare the options for closing the gap.** Ground-based camera networks (ALERTCalifornia), lookout towers, manned patrol aircraft, public-reporting routing, and autonomous loiter platforms are all candidates and none is evaluated against the others here. The work measures the hole; choosing the fill is downstream.
+- **The 97% combines sensor miss with overpass-sampling miss.** Suomi-NPP gives a given CA point 1–2 distinct overpasses per day; a 90-minute grass fire between overpasses produces no detection regardless of sensor sensitivity.
 - **The LANDFIRE fuel feature is suspect on inspection.** 61% of FPA-FOD ignitions snap to non-burnable LANDFIRE cells because human-caused fires cluster in the urban-wildland interface. The v3 (terrain+fuel) null result may be a bad-feature null rather than a no-signal null.
 - **All other caveats are in the memo's "Honest limitations" section.**
 

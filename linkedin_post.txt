@@ -2,27 +2,31 @@
 LINKEDIN POST (paste as-is)
 ═══════════════════════════════════════════════════════════════════════
 
-Spent a few weeks looking at how often satellites actually catch California wildfires. What I found:
+An open-data analysis: how often does the standard public satellite wildfire detection product (NASA's FIRMS / VIIRS, the system most US fire agencies have historically relied on) actually catch California wildfires? Scoped to that single open dataset for the 2020 fire season:
 
-→ Satellites never see 97% of California wildfires that get contained under 10 acres — and those small fires are 93% of all California fires in a year.
+For fires contained under 10 acres (93% of all California fires), the public product reports no detection 97% of the time. For the fires it does catch, alerts arrive a median of about 7 hours after the ground-reported alarm, and only for the biggest, most notable ones. Two causes: the sensor can't reliably pick up small fires' heat signatures, and the satellite only passes overhead once or twice a day.
 
-→ Even when satellites do catch a fire, they're about 7 hours late on average, and that's only for the biggest, most notable ones. By the time anyone gets an alert, half a day of fire growth has already happened.
+About the images:
 
-→ The gap has two causes: satellites can't see a small fire's heat signature even when looking, AND the satellite only passes over any given spot in California once or twice a day.
+First chart: the detection cliff by fire size. The public product catches 3% of fires under a quarter acre, 6% under 10 acres, and only past about a thousand acres does it start reliably reporting. Most California fires never get that big.
 
-→ I built a map of where the blind spots cluster across the state — the heavily forested northern interior. The general finding (satellites miss small fires) is rock solid. The specific map needs more years and more states before anyone bets a real decision on it; 2020 was an unusual fire year for CA.
+Second: a state-wide map of where the blind spots cluster in the public product. The heavily forested northern interior shows the highest miss probability for a hypothetical 100-acre fire. Big caveat: 2020 was an unusual fire year, so the specific map needs more years and other states before anyone bets a decision on it.
 
-→ The takeaway: there's a real, measurable detection gap in the size range where fires are still small enough to stop. Whatever closes that gap — cameras, lookouts, faster public reporting, aerial patrol, some combination — is filling an operational hole that satellite-only systems demonstrably can't.
+Third: how late the public product is when it does eventually catch a fire. About 7 hours median, but only for the biggest notable fires. For everything else, the answer is "never."
 
-Code + 12-page write-up: github.com/MatthewDegtyar/california-wildfire-detection-gap
+Important scope: this is one public dataset, one fire season, one state. I did not evaluate the commercial thermal-imaging constellations (OroraTech, Constellr, FireSat from Muon Space / Earth Fire Alliance) that are explicitly being built to close gaps like this and are either operational or launching in 2026. The point of the analysis was the end-to-end pipeline on open data, not a claim about the broader satellite landscape.
 
-#wildfire #california
+The work: fetch FIRMS detections, join multiple ground-truth sources (FPA-FOD, NIFC perimeters, CAL FIRE incidents), build a calibrated gradient-boost model with honest uncertainty bands, write findings up with explicit limitations.
+
+Code and 12-page write-up: github.com/MatthewDegtyar/california-wildfire-detection-gap
+
+#dataanalysis #remotesensing #opendata #wildfire #python
 
 
 ═══════════════════════════════════════════════════════════════════════
 IMAGES (in linkedin_images/)
 ═══════════════════════════════════════════════════════════════════════
 
-1. 1_hit_rate_by_size.png  — chart of satellite detection rate by fire size
-2. 2_gap_surface.png       — map of where the gap is largest across CA
-3. 3_latency.png           — optional 3rd: how late satellite alerts arrive
+1. 1_hit_rate_by_size.png : the detection cliff (referenced as "first chart")
+2. 2_gap_surface.png      : CA map of blind spots in the public product
+3. 3_latency.png          : how late the public product is when it catches
